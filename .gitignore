@@ -1,0 +1,9 @@
+# Ignore composer dependencies
+/vendor/
+
+# Ignore PHPStorm project files
+.idea/
+
+# Ignore other files and directories
+.gitignore
+*.log
