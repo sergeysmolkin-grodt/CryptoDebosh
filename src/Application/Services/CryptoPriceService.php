@@ -16,7 +16,7 @@ class CryptoPriceService
         $this->binanceApiService = $binanceApiService;
     }
 
-    public function getCryptoPrices(): array
+    public function getCryptoPrices()
     {
         $prices = $this->binanceApiService->getPrices();
         $cryptoPrices = [];

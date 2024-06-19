@@ -3,7 +3,8 @@
   "description": "TradingBot",
   "require": {
     "php": "^8.3",
-    "binance/binance-connector-php": "^1.6"
+    "binance/binance-connector-php": "^1.6",
+    "symfony/console": "^7.1"
   },
   "autoload": {
     "psr-4": {
@@ -11,8 +12,8 @@
     }
   },
   "require-dev": {
-    "roave/security-advisories": "dev-latest"
-    ,
+    "roave/security-advisories": "dev-latest",
+
     "phpunit/phpunit": "^11.2"
   }
 }
