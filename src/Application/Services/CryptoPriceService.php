@@ -9,7 +9,7 @@ use CryptoDebosh\Infrastructure\Services\BinanceApiService;
 
 class CryptoPriceService
 {
-    private $binanceApiService;
+    private BinanceApiService $binanceApiService;
 
     public function __construct(BinanceApiService $binanceApiService)
     {
@@ -18,13 +18,6 @@ class CryptoPriceService
 
     public function getCryptoPrices()
     {
-        $prices = $this->binanceApiService->getPrices();
-        $cryptoPrices = [];
-
-        foreach ($prices as $price) {
-            $cryptoPrices[] = new CryptoPrice($price['symbol'], $price['price']);
-        }
-
-        return $cryptoPrices;
+        return $this->binanceApiService->getPrices();
     }
 }

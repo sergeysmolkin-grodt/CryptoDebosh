@@ -19,14 +19,4 @@ class BinanceApiService
     {
         return $this->client->tickerPrice();
     }
-
-    public function newOrder($symbol, $side, $quantity)
-    {
-        return $this->client->newOrder([
-            'symbol' => $symbol,
-            'side' => $side,
-            'type' => 'MARKET',
-            'quantity' => $quantity,
-        ]);
-    }
 }

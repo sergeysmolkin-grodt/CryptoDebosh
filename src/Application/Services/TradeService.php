@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Application\Services;
+namespace CryptoDebosh\Application\Services;
+
+use CryptoDebosh\Infrastructure\Services\BinanceApiService;
 
 class TradeService
 {
@@ -17,7 +19,6 @@ class TradeService
     {
         $response = $this->binanceApiService->newOrder($symbol, $side, $quantity);
         $trade = new Trade($response['orderId'], $symbol, $side, $quantity, $response['fills'][0]['price']);
-        // Здесь можно сохранить $trade в репозиторий, если нужно
 
         return $trade;
     }
