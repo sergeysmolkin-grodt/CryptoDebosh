@@ -14,12 +14,12 @@ class TradingBotService
 
     public function __construct($key, $secret)
     {
-        $this->key = trim($key);  // Ensure keys are trimmed of any whitespace
+        $this->key = trim($key);
         $this->secret = trim($secret);
 
         $guzzleClient = new Client([
-            'verify' => false, // Disable SSL verification for testing
-            'debug' => true,   // Enable debugging information
+            'verify' => false,
+            'debug' => true,
         ]);
 
         $this->client = new Spot([
@@ -35,7 +35,7 @@ class TradingBotService
         $klines = $this->client->klines($symbol, $interval, ['limit' => $limit]);
         $sum = 0;
         foreach ($klines as $kline) {
-            $sum += ($kline[1] + $kline[4]) / 2; // average price (open + close) / 2
+            $sum += ($kline[1] + $kline[4]) / 2;
         }
         return $sum / $limit;
     }
@@ -78,10 +78,8 @@ class TradingBotService
         echo "Short Moving Average: $shortMA\n";
         echo "Long Moving Average: $longMA\n";
 
-        // Force buy for testing
         if ($usdtBalance >= $investment) {
-            // Buy
-            $quantity = bcdiv($investment, $shortMA, 6); // Ensure quantity is a string with 6 decimal places
+            $quantity = bcdiv($investment, $shortMA, 6);
             echo "Attempting to purchase $quantity BTC with $investment USDT\n";
             try {
                 $response = $this->client->newOrder(
@@ -98,9 +96,8 @@ class TradingBotService
             }
         } else {
             echo "No conditions for buying. Checking for selling conditions...\n";
-            // Sell
             if ($cryptoBalance !== null && $cryptoBalance > 0) {
-                $quantity = bcdiv($cryptoBalance, '1', 6); // Ensure quantity is a string with 6 decimal places
+                $quantity = bcdiv($cryptoBalance, '1', 6);
                 echo "Attempting to sell $quantity BTC\n";
                 try {
                     $response = $this->client->newOrder(
@@ -118,6 +115,18 @@ class TradingBotService
             } else {
                 echo "Crypto balance not found or zero.\n";
             }
+        }
+    }
+
+    public function run($symbol, $investment, $intervalSeconds = 60): void
+    {
+        while (true) {
+            try {
+                $this->trade($symbol, $investment);
+            } catch (\Exception $e) {
+                echo "Error in trading loop: " . $e->getMessage() . "\n";
+            }
+            sleep($intervalSeconds);
         }
     }
 }
