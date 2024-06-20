@@ -26,11 +26,11 @@ class TradingBotService
             'key' => $this->key,
             'secret' => $this->secret,
             'recvWindow' => 60000,
-            'http_client_handler' => $guzzleClient,
+
         ]);
     }
 
-    public function getMovingAverage($symbol, $interval, $limit)
+    public function getMovingAverage($symbol, $interval, $limit): float|int
     {
         $klines = $this->client->klines($symbol, $interval, ['limit' => $limit]);
         $sum = 0;
@@ -84,7 +84,7 @@ class TradingBotService
             try {
                 $response = $this->client->newOrder(
                     'BTCUSDT',
-                    'BUY',
+                    'SELL',
                     'MARKET',
                     [
                         'quantity' => $quantity
