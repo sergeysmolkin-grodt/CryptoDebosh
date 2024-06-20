@@ -2,17 +2,13 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-use CryptoDebosh\Infrastructure\Services\BinanceApiService;
-use CryptoDebosh\Application\Services\CryptoPriceService;
-use CryptoDebosh\Presentation\Commands\GetCryptoPricesCommand;
+use CryptoDebosh\Application\Services\BlockchainService;
+use CryptoDebosh\Presentation\Commands\BlockchainCommand;
 use Symfony\Component\Console\Application;
 
-$config = require __DIR__ . '/config/config.php';
-
-$binanceApiService = new BinanceApiService($config['binance']['apiKey'], $config['binance']['secretKey']);
-$cryptoPriceService = new CryptoPriceService($binanceApiService);
+$blockchainService = new BlockchainService();
 
 $application = new Application();
-$application->add(new GetCryptoPricesCommand($cryptoPriceService));
+$application->add(new BlockchainCommand($blockchainService));
 
 return $application;
