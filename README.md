@@ -1,3 +1,3 @@
 ﻿# CryptoDodger
-trading bot
-lost wallets with crypto finder
+#trading bot
+**lost wallets with crypto finder**
