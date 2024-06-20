@@ -2,8 +2,8 @@
 
 return [
     'binance' => [
-        'apiKey' => 'HEWuGi0Q22bEZGq40HfarpoUYzd1adSJye1hC0bYAjUD6agE2hCl7OojOO9adv9O',
-        'secretKey' => 'lHoxhu54FL1BjEq4xpd9E0DK6n7AUypfF8q8xWfkOVDYDSiPX1YWqPGDLz313bFN',
+        'apiKey' => 'AngXKulxLI8g9QAmyWQp2gPwABXuLBU8WfLLZtLREGBQijvaLxBspjXQ2I2ba0Es',
+        'secretKey' => '3uTMpqY6K17quu2x1cPqhwx8Dr12VoZWBOcZAUwbdP2ACr5ZBAGblfuPgWxqlZCh',
     ],
     'log_file' => __DIR__ . '/../logs/bot.log',
 ];
