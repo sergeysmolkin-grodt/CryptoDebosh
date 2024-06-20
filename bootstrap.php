@@ -2,13 +2,16 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-use CryptoDebosh\Application\Services\BlockchainService;
-use CryptoDebosh\Presentation\Commands\BlockchainCommand;
+
+use CryptoDebosh\Application\Services\TradingBotService;
+use CryptoDebosh\Presentation\Commands\TradingBotCommand;
 use Symfony\Component\Console\Application;
 
-$blockchainService = new BlockchainService();
+$config = require __DIR__ . '/config/config.php';
+$tradingBotService = new TradingBotService($config['binance']['apiKey'], $config['binance']['secretKey']);
+
 
 $application = new Application();
-$application->add(new BlockchainCommand($blockchainService));
+$application->add(new TradingBotCommand($tradingBotService));
 
 return $application;
