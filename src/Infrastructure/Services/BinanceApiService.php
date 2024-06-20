@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CryptoDebosh\Infrastructure\Services;
 
 use Binance\Spot;
+use GuzzleHttp\Client;
 
 class BinanceApiService
 {
@@ -12,7 +13,16 @@ class BinanceApiService
 
     public function __construct($apiKey, $secretKey)
     {
-        $this->client = new Spot($apiKey, $secretKey);
+        $guzzleClient = new Client([
+            'verify' => false,
+        ]);
+
+        $this->client = new Spot([
+            'apiKey' => $apiKey,
+            'secretKey' => $secretKey,
+            'http_client_handler' => $guzzleClient, // Указание кастомного клиента Guzzle
+
+        ]);
     }
 
     public function getPrices()

@@ -14,5 +14,5 @@ $cryptoPriceService = new CryptoPriceService($binanceApiService);
 
 $application = new Application();
 $application->add(new GetCryptoPricesCommand($cryptoPriceService));
-var_dump($application);
+
 return $application;
