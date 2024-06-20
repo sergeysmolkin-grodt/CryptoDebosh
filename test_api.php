@@ -17,9 +17,12 @@ $guzzleClient = new Client([
 
 $client = new Spot([
     'apiKey' => $apiKey,
-    'secretKey' => $secretKey,
+    'secret' => $secretKey,
     'http_client_handler' => $guzzleClient,
     'recvWindow' => 60000,
+    'options' => [
+        'adjustForTimeDifference' => true
+    ]
 ]);
 
 try {
