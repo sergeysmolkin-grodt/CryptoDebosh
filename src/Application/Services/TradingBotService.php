@@ -8,14 +8,14 @@ use GuzzleHttp\Client;
 
 class TradingBotService
 {
-    private $apiKey;
-    private $secretKey;
-    private $client;
+    private string $key;
+    private string $secret;
+    private Spot $client;
 
-    public function __construct($apiKey, $secretKey)
+    public function __construct($key, $secret)
     {
-        $this->apiKey = trim($apiKey);  // Ensure keys are trimmed of any whitespace
-        $this->secretKey = trim($secretKey);
+        $this->key = trim($key);  // Ensure keys are trimmed of any whitespace
+        $this->secret = trim($secret);
 
         $guzzleClient = new Client([
             'verify' => false, // Disable SSL verification for testing
@@ -23,13 +23,10 @@ class TradingBotService
         ]);
 
         $this->client = new Spot([
-            'key' => $this->apiKey,
-            'secret' => $this->secretKey,
-            'http_client_handler' => $guzzleClient,
+            'key' => $this->key,
+            'secret' => $this->secret,
             'recvWindow' => 60000,
-            'options' => [
-                'adjustForTimeDifference' => true
-            ]
+            'http_client_handler' => $guzzleClient,
         ]);
     }
 
@@ -48,7 +45,13 @@ class TradingBotService
      */
     public function trade($symbol, $investment)
     {
-        $accountInfo = $this->client->account(['recvWindow' => 60000]);
+        try {
+            $accountInfo = $this->client->account(['recvWindow' => 60000]);
+        } catch (\Exception $e) {
+            echo "Error fetching account info: " . $e->getMessage() . "\n";
+            return;
+        }
+
         $balances = $accountInfo['balances'];
 
         $usdtBalance = null;
@@ -67,7 +70,7 @@ class TradingBotService
         }
 
         echo "USDT Balance: $usdtBalance\n";
-        echo "Crypto Balance: $cryptoBalance\n";
+        echo "Crypto Balance (BTC): $cryptoBalance\n";
 
         $shortMA = $this->getMovingAverage($symbol, '1m', 5);
         $longMA = $this->getMovingAverage($symbol, '1m', 20);
@@ -75,30 +78,46 @@ class TradingBotService
         echo "Short Moving Average: $shortMA\n";
         echo "Long Moving Average: $longMA\n";
 
-        if ($shortMA > $longMA && $usdtBalance >= $investment) {
+        // Force buy for testing
+        if ($usdtBalance >= $investment) {
             // Buy
             $quantity = bcdiv($investment, $shortMA, 6); // Ensure quantity is a string with 6 decimal places
             echo "Attempting to purchase $quantity BTC with $investment USDT\n";
-            $response = $this->client->newOrder('BTCUSDT', 'BUY', 'MARKET', [
-                'quantity' => $quantity,
-                'recvWindow' => 60000, // Set recvWindow to 60 seconds
-            ]);
-            echo "Purchased BTC worth $investment USDT. Response: " . json_encode($response) . "\n";
-        } elseif ($shortMA < $longMA) {
+            try {
+                $response = $this->client->newOrder(
+                    'BTCUSDT',
+                    'BUY',
+                    'MARKET',
+                    [
+                        'quantity' => $quantity
+                    ]
+                );
+                echo "Purchased BTC worth $investment USDT. Response: " . json_encode($response) . "\n";
+            } catch (\Exception $e) {
+                echo "Error executing buy order: " . $e->getMessage() . "\n";
+            }
+        } else {
+            echo "No conditions for buying. Checking for selling conditions...\n";
             // Sell
             if ($cryptoBalance !== null && $cryptoBalance > 0) {
                 $quantity = bcdiv($cryptoBalance, '1', 6); // Ensure quantity is a string with 6 decimal places
                 echo "Attempting to sell $quantity BTC\n";
-                $response = $this->client->newOrder('BTCUSDT', 'SELL', 'MARKET', [
-                    'quantity' => $quantity,
-                    'recvWindow' => 60000, // Set recvWindow to 60 seconds
-                ]);
-                echo "Sold all available BTC. Response: " . json_encode($response) . "\n";
+                try {
+                    $response = $this->client->newOrder(
+                        'BTCUSDT',
+                        'SELL',
+                        'MARKET',
+                        [
+                            'quantity' => $quantity
+                        ]
+                    );
+                    echo "Sold all available BTC. Response: " . json_encode($response) . "\n";
+                } catch (\Exception $e) {
+                    echo "Error executing sell order: " . $e->getMessage() . "\n";
+                }
             } else {
-                throw new \Exception("Crypto balance not found or zero.");
+                echo "Crypto balance not found or zero.\n";
             }
-        } else {
-            echo "No conditions for buying or selling.\n";
         }
     }
 }
