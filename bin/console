@@ -2,4 +2,5 @@
 <?php
 
 $application = require 'bootstrap.php';
+
 $application->run();
