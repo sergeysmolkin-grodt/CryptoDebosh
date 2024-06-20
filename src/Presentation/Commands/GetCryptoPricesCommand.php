@@ -9,7 +9,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class GetCryptoPricesCommand extends Command
 {
-    // Установите имя команды
     protected static $defaultName = 'app:get-crypto-prices';
     private $cryptoPriceService;
 
@@ -22,7 +21,7 @@ class GetCryptoPricesCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(self::$defaultName)  // Установите имя команды явно
+            ->setName(self::$defaultName)
             ->setDescription('Gets the current prices of cryptocurrencies.')
             ->setHelp('This command allows you to get the current prices of cryptocurrencies from Binance.');
     }
