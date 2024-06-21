@@ -1,9 +1,12 @@
 <?php
 
 return [
+    'name' => 'CryptoDebosh',
+    'version' => '1.0.0',
     'binance' => [
-        'apiKey' => 'AngXKulxLI8g9QAmyWQp2gPwABXuLBU8WfLLZtLREGBQijvaLxBspjXQ2I2ba0Es',
-        'secretKey' => '3uTMpqY6K17quu2x1cPqhwx8Dr12VoZWBOcZAUwbdP2ACr5ZBAGblfuPgWxqlZCh',
+        'api_key' => getenv('BINANCE_API_KEY'),
+        'secret_key' => getenv('BINANCE_SECRET_KEY'),
+        'recv_window' => 60000,
     ],
     'log_file' => __DIR__ . '/../logs/bot.log',
 ];
