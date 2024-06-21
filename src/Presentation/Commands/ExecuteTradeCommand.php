@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace CryptoDebosh\Presentation\Commands;
 
-use Application\Services\TradeService;
+
+use CryptoDebosh\Application\Services\TradeService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

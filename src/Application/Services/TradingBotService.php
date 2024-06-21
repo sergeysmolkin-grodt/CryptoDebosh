@@ -16,7 +16,7 @@ class TradingBotService
     {
         $this->key = trim($key);
         $this->secret = trim($secret);
-        dd($this->secret, $this->key);
+
         $guzzleClient = new Client([
             'verify' => false,
             'debug' => true,
