@@ -130,7 +130,7 @@ class TradingBotService
                 );
                 echo "Purchased BTC worth $investment USDT. Response: " . json_encode($response) . "\n";
 
-                
+
                 $accountInfo = $this->client->account(['recvWindow' => 60000]);
                 $balances = $accountInfo['balances'];
                 foreach ($balances as $b) {
