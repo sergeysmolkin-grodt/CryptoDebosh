@@ -1,8 +1,9 @@
 <?php
 
-namespace CryptoDebosh\Presentation\Commands;
+namespace App\Presentation\Commands;
 
-use CryptoDebosh\Application\Services\TradingBotService;
+
+use App\Application\Services\TradingBotService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -11,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TradingBotCommand extends Command
 {
-    protected static string $defaultName = 'app:trading-bot';
+    protected static $defaultName = 'app:trading-bot';
 
     private TradingBotService $tradingBotService;
 

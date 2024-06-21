@@ -20,5 +20,4 @@ services:
         arguments:
             $key: '%env(BINANCE_API_KEY)%'
             $secret: '%env(BINANCE_SECRET_KEY)%'
-
-    CryptoDebosh\Application\Factories\TradingStrategyFactory: ~
+            $strategy: '@App\Application\Services\TradingStrategies\MovingAverageStrategy'
