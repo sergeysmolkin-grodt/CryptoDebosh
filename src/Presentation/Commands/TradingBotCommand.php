@@ -11,9 +11,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TradingBotCommand extends Command
 {
-    protected static $defaultName = 'app:trading-bot';
+    protected static string $defaultName = 'app:trading-bot';
 
-    private $tradingBotService;
+    private TradingBotService $tradingBotService;
 
     public function __construct(TradingBotService $tradingBotService)
     {
@@ -28,6 +28,7 @@ class TradingBotCommand extends Command
             ->setDescription('Run the trading bot.')
             ->addArgument('symbol', InputArgument::REQUIRED, 'The trading symbol, e.g., BTCUSDT')
             ->addArgument('investment', InputArgument::REQUIRED, 'The amount to invest in USDT')
+            ->addOption('strategy', 's', InputOption::VALUE_REQUIRED, 'The trading strategy to use', 'moving_average')
             ->addOption('continuous', 'c', InputOption::VALUE_NONE, 'Run the bot continuously');
     }
 
@@ -35,13 +36,16 @@ class TradingBotCommand extends Command
     {
         $symbol = $input->getArgument('symbol');
         $investment = $input->getArgument('investment');
+        $strategy = $input->getOption('strategy');
         $continuous = $input->getOption('continuous');
 
+        $this->tradingBotService->setStrategy($strategy);
+
         if ($continuous) {
-            $output->writeln('Starting the bot in continuous mode...');
+            $output->writeln('Starting the bot in continuous mode with strategy: ' . $strategy);
             $this->tradingBotService->run($symbol, $investment);
         } else {
-            $output->writeln('Running a single trade...');
+            $output->writeln('Running a single trade with strategy: ' . $strategy);
             $this->tradingBotService->trade($symbol, $investment);
         }
 
