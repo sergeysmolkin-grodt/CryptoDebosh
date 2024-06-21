@@ -30,6 +30,7 @@ class TradingBotService
         ]);
     }
 
+    // Method to retrieve symbol filters such as LOT_SIZE and MIN_NOTIONAL
     private function getSymbolFilters($symbol)
     {
         $exchangeInfo = $this->client->exchangeInfo();
@@ -41,18 +42,19 @@ class TradingBotService
         throw new \Exception("Filters not found for symbol $symbol");
     }
 
+    // Method to calculate the moving average
     public function getMovingAverage($symbol, $interval, $limit): float|int
     {
         $klines = $this->client->klines($symbol, $interval, ['limit' => $limit]);
         $sum = 0;
         foreach ($klines as $kline) {
-            $sum += ($kline[1] + $kline[4]) / 2;
+            $sum += ($kline[1] + $kline[4]) / 2; // Average price (open + close) / 2
         }
-        return $sum / $limit;
+        return $sum / $limit; // Moving average
     }
 
     /**
-     * @throws MissingArgumentException
+     * Method to execute trades based on moving averages
      * @throws \Exception
      */
     public function trade($symbol, $investment)
@@ -84,8 +86,9 @@ class TradingBotService
         echo "USDT Balance: $usdtBalance\n";
         echo "Crypto Balance (BTC): $cryptoBalance\n";
 
-        $shortMA = $this->getMovingAverage($symbol, '1m', 5);
-        $longMA = $this->getMovingAverage($symbol, '1m', 20);
+        // Moving average parameters
+        $shortMA = $this->getMovingAverage($symbol, '15m', 5); // Short moving average, 15-minute interval and 5 periods
+        $longMA = $this->getMovingAverage($symbol, '15m', 15); // Long moving average, 15-minute interval and 15 periods
 
         echo "Short Moving Average: $shortMA\n";
         echo "Long Moving Average: $longMA\n";
@@ -102,13 +105,13 @@ class TradingBotService
             }
         }
 
-        $quantity = bcdiv($investment, $shortMA, 8); // Восемь знаков после запятой для большей точности
+        $quantity = bcdiv($investment, $shortMA, 8); // Amount of cryptocurrency to buy, can change the number of decimal places for greater accuracy
 
         if ($quantity < $minQty) {
             $quantity = $minQty;
         }
 
-        // Приведение к шагу
+        // Adjusting to step size
         $precision = log10(1 / $stepSize);
         $quantity = floor($quantity / $stepSize) * $stepSize;
         $quantity = number_format($quantity, $precision, '.', '');
@@ -131,7 +134,7 @@ class TradingBotService
         } else {
             echo "No conditions for buying. Checking for selling conditions...\n";
             if ($cryptoBalance !== null && $cryptoBalance > 0) {
-                $quantity = bcdiv($cryptoBalance, '1', 8); // Восемь знаков после запятой для большей точности
+                $quantity = bcdiv($cryptoBalance, '1', 8); // Amount of cryptocurrency to sell, can change the number of decimal places for greater accuracy
                 $quantity = floor($quantity / $stepSize) * $stepSize;
                 $quantity = number_format($quantity, $precision, '.', '');
                 echo "Attempting to sell $quantity BTC\n";
@@ -155,15 +158,18 @@ class TradingBotService
         }
     }
 
-    public function run($symbol, $investment, $intervalSeconds = 10): void
+    // Method to run the bot continuously
+    public function run($symbol, $investment, $intervalSeconds = 60): void
     {
         while (true) {
             try {
                 $this->trade($symbol, $investment);
+                // Interval parameter, can be changed to control the frequency of trading conditions checks
+                sleep($intervalSeconds);
             } catch (\Exception $e) {
                 echo "Error in trading loop: " . $e->getMessage() . "\n";
+                sleep($intervalSeconds); // Delay on error to avoid spamming
             }
-            sleep($intervalSeconds);
         }
     }
 }
