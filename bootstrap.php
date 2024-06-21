@@ -8,9 +8,12 @@ use Symfony\Component\Console\Application;
 
 $config = require __DIR__ . '/config/config.php';
 
-$tradingBotService = new TradingBotService($config['binance']['api_key'], $config['binance']['secret_key']);
+$tradingBotService = new TradingBotService(
+    $config['binance']['api_key'],
+    $config['binance']['secret_key'],
+    'moving_average' // Указание стратегии
+);
 
 $application = new Application();
 $application->add(new TradingBotCommand($tradingBotService));
-
-return $application;
+$application->run();
