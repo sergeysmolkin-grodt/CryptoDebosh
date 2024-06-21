@@ -45,9 +45,19 @@ class TradingBotService
         throw new \Exception("LOT_SIZE filter not found for symbol $symbol");
     }
 
-    private function roundToLotSize($quantity, $minQty)
+    private function getMinNotional($symbol)
     {
-        return bcmul(bcdiv($quantity, $minQty, 0), $minQty, 8);
+        $exchangeInfo = $this->client->exchangeInfo();
+        foreach ($exchangeInfo['symbols'] as $s) {
+            if ($s['symbol'] === $symbol) {
+                foreach ($s['filters'] as $filter) {
+                    if ($filter['filterType'] === 'MIN_NOTIONAL') {
+                        return $filter['minNotional'];
+                    }
+                }
+            }
+        }
+        throw new \Exception("MIN_NOTIONAL filter not found for symbol $symbol");
     }
 
     public function getMovingAverage($symbol, $interval, $limit): float|int
@@ -100,10 +110,14 @@ class TradingBotService
         echo "Long Moving Average: $longMA\n";
 
         $minOrderSize = $this->getMinOrderSize($symbol);
-        $quantity = bcdiv($investment, $shortMA, 8);
-        $quantity = $this->roundToLotSize($quantity, $minOrderSize);
+        $minNotional = $this->getMinNotional($symbol);
+        $quantity = max(bcdiv($investment, $shortMA, 6), $minOrderSize);
 
-        if ($usdtBalance >= $investment) {
+        if (bccomp(bcmul($quantity, $shortMA, 8), $minNotional, 8) < 0) {
+            $quantity = bcdiv($minNotional, $shortMA, 6);
+        }
+
+        if ($shortMA > $longMA && $usdtBalance >= $investment) {
             echo "Attempting to purchase $quantity BTC with $investment USDT\n";
             try {
                 $response = $this->client->newOrder(
@@ -115,13 +129,27 @@ class TradingBotService
                     ]
                 );
                 echo "Purchased BTC worth $investment USDT. Response: " . json_encode($response) . "\n";
+
+                
+                $accountInfo = $this->client->account(['recvWindow' => 60000]);
+                $balances = $accountInfo['balances'];
+                foreach ($balances as $b) {
+                    if ($b['asset'] === 'USDT') {
+                        $usdtBalance = $b['free'];
+                    }
+                    if ($b['asset'] === explode('USDT', $symbol)[0]) {
+                        $cryptoBalance = $b['free'];
+                    }
+                }
+                echo "Updated USDT Balance: $usdtBalance\n";
+                echo "Updated Crypto Balance (BTC): $cryptoBalance\n";
             } catch (\Exception $e) {
                 echo "Error executing buy order: " . $e->getMessage() . "\n";
             }
         } else {
             echo "No conditions for buying. Checking for selling conditions...\n";
             if ($cryptoBalance !== null && $cryptoBalance > 0) {
-                $quantity = $this->roundToLotSize($cryptoBalance, $minOrderSize);
+                $quantity = max(bcdiv($cryptoBalance, '1', 6), $minOrderSize);
                 echo "Attempting to sell $quantity BTC\n";
                 try {
                     $response = $this->client->newOrder(
@@ -130,9 +158,23 @@ class TradingBotService
                         'MARKET',
                         [
                             'quantity' => $quantity,
+                            'recvWindow' => 60000,
                         ]
                     );
                     echo "Sold all available BTC. Response: " . json_encode($response) . "\n";
+
+                    $accountInfo = $this->client->account(['recvWindow' => 60000]);
+                    $balances = $accountInfo['balances'];
+                    foreach ($balances as $b) {
+                        if ($b['asset'] === 'USDT') {
+                            $usdtBalance = $b['free'];
+                        }
+                        if ($b['asset'] === explode('USDT', $symbol)[0]) {
+                            $cryptoBalance = $b['free'];
+                        }
+                    }
+                    echo "Updated USDT Balance: $usdtBalance\n";
+                    echo "Updated Crypto Balance (BTC): $cryptoBalance\n";
                 } catch (\Exception $e) {
                     echo "Error executing sell order: " . $e->getMessage() . "\n";
                 }
