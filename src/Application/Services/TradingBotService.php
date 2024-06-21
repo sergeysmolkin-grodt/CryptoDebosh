@@ -30,34 +30,15 @@ class TradingBotService
         ]);
     }
 
-    private function getMinOrderSize($symbol)
+    private function getSymbolFilters($symbol)
     {
         $exchangeInfo = $this->client->exchangeInfo();
         foreach ($exchangeInfo['symbols'] as $s) {
             if ($s['symbol'] === $symbol) {
-                foreach ($s['filters'] as $filter) {
-                    if ($filter['filterType'] === 'LOT_SIZE') {
-                        return $filter['minQty'];
-                    }
-                }
+                return $s['filters'];
             }
         }
-        throw new \Exception("LOT_SIZE filter not found for symbol $symbol");
-    }
-
-    private function getMinNotional($symbol)
-    {
-        $exchangeInfo = $this->client->exchangeInfo();
-        foreach ($exchangeInfo['symbols'] as $s) {
-            if ($s['symbol'] === $symbol) {
-                foreach ($s['filters'] as $filter) {
-                    if ($filter['filterType'] === 'MIN_NOTIONAL') {
-                        return $filter['minNotional'];
-                    }
-                }
-            }
-        }
-        throw new \Exception("MIN_NOTIONAL filter not found for symbol $symbol");
+        throw new \Exception("Filters not found for symbol $symbol");
     }
 
     public function getMovingAverage($symbol, $interval, $limit): float|int
@@ -109,13 +90,28 @@ class TradingBotService
         echo "Short Moving Average: $shortMA\n";
         echo "Long Moving Average: $longMA\n";
 
-        $minOrderSize = $this->getMinOrderSize($symbol);
-        $minNotional = $this->getMinNotional($symbol);
-        $quantity = max(bcdiv($investment, $shortMA, 6), $minOrderSize);
+        $filters = $this->getSymbolFilters($symbol);
+        $minQty = null;
+        $stepSize = null;
 
-        if (bccomp(bcmul($quantity, $shortMA, 8), $minNotional, 8) < 0) {
-            $quantity = bcdiv($minNotional, $shortMA, 6);
+        foreach ($filters as $filter) {
+            if ($filter['filterType'] === 'LOT_SIZE') {
+                $minQty = $filter['minQty'];
+                $stepSize = $filter['stepSize'];
+                echo "Min LOT_SIZE: $minQty, Step Size: $stepSize\n";
+            }
         }
+
+        $quantity = bcdiv($investment, $shortMA, 8); // Восемь знаков после запятой для большей точности
+
+        if ($quantity < $minQty) {
+            $quantity = $minQty;
+        }
+
+        // Приведение к шагу
+        $precision = log10(1 / $stepSize);
+        $quantity = floor($quantity / $stepSize) * $stepSize;
+        $quantity = number_format($quantity, $precision, '.', '');
 
         if ($shortMA > $longMA && $usdtBalance >= $investment) {
             echo "Attempting to purchase $quantity BTC with $investment USDT\n";
@@ -129,31 +125,19 @@ class TradingBotService
                     ]
                 );
                 echo "Purchased BTC worth $investment USDT. Response: " . json_encode($response) . "\n";
-
-
-                $accountInfo = $this->client->account(['recvWindow' => 60000]);
-                $balances = $accountInfo['balances'];
-                foreach ($balances as $b) {
-                    if ($b['asset'] === 'USDT') {
-                        $usdtBalance = $b['free'];
-                    }
-                    if ($b['asset'] === explode('USDT', $symbol)[0]) {
-                        $cryptoBalance = $b['free'];
-                    }
-                }
-                echo "Updated USDT Balance: $usdtBalance\n";
-                echo "Updated Crypto Balance (BTC): $cryptoBalance\n";
             } catch (\Exception $e) {
                 echo "Error executing buy order: " . $e->getMessage() . "\n";
             }
         } else {
             echo "No conditions for buying. Checking for selling conditions...\n";
             if ($cryptoBalance !== null && $cryptoBalance > 0) {
-                $quantity = max(bcdiv($cryptoBalance, '1', 6), $minOrderSize);
+                $quantity = bcdiv($cryptoBalance, '1', 8); // Восемь знаков после запятой для большей точности
+                $quantity = floor($quantity / $stepSize) * $stepSize;
+                $quantity = number_format($quantity, $precision, '.', '');
                 echo "Attempting to sell $quantity BTC\n";
                 try {
                     $response = $this->client->newOrder(
-                        'BTCUSDT',
+                        'BTCUSDT', // Ensure the symbol is correct and fully specified
                         'SELL',
                         'MARKET',
                         [
@@ -162,19 +146,6 @@ class TradingBotService
                         ]
                     );
                     echo "Sold all available BTC. Response: " . json_encode($response) . "\n";
-
-                    $accountInfo = $this->client->account(['recvWindow' => 60000]);
-                    $balances = $accountInfo['balances'];
-                    foreach ($balances as $b) {
-                        if ($b['asset'] === 'USDT') {
-                            $usdtBalance = $b['free'];
-                        }
-                        if ($b['asset'] === explode('USDT', $symbol)[0]) {
-                            $cryptoBalance = $b['free'];
-                        }
-                    }
-                    echo "Updated USDT Balance: $usdtBalance\n";
-                    echo "Updated Crypto Balance (BTC): $cryptoBalance\n";
                 } catch (\Exception $e) {
                     echo "Error executing sell order: " . $e->getMessage() . "\n";
                 }
@@ -184,7 +155,7 @@ class TradingBotService
         }
     }
 
-    public function run($symbol, $investment, $intervalSeconds = 60): void
+    public function run($symbol, $investment, $intervalSeconds = 10): void
     {
         while (true) {
             try {
