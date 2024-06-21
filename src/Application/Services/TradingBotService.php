@@ -6,11 +6,15 @@ use Binance\Exception\MissingArgumentException;
 use Binance\Spot;
 use GuzzleHttp\Client;
 
-class TradingBotService
+final class TradingBotService
 {
-    private string $key;
-    private string $secret;
+    private readonly string $key;
+    private readonly string $secret;
     private Spot $client;
+
+    private const int RSI_BUY = 30;
+
+    private const int RSI_SELL = 70;
 
     public function __construct($key, $secret)
     {
@@ -53,8 +57,39 @@ class TradingBotService
         return $sum / $limit; // Moving average
     }
 
+    // Method to calculate the RSI
+    private function calculateRSI($symbol, $interval, $limit = 14): float
+    {
+        $klines = $this->client->klines($symbol, $interval, ['limit' => $limit + 1]);
+        $gains = 0;
+        $losses = 0;
+
+        for ($i = 1, $iMax = count($klines); $i < $iMax; $i++) {
+            $change = $klines[$i][4] - $klines[$i - 1][4];
+            if ($change > 0) {
+                $gains += $change;
+            } else {
+                $losses += abs($change);
+            }
+        }
+
+        $averageGain = $gains / $limit;
+        $averageLoss = $losses / $limit;
+
+        if ($averageLoss == 0) {
+            return 100;
+        }
+
+        $rs = $averageGain / $averageLoss;
+        $rsi = 100 - (100 / (1 + $rs));
+
+        return $rsi;
+    }
+
     /**
-     * Method to execute trades based on moving averages
+     * Method to execute trades based on moving averages and RSI
+     *
+     * @throws MissingArgumentException
      * @throws \Exception
      */
     public function trade($symbol, $investment)
@@ -86,12 +121,15 @@ class TradingBotService
         echo "USDT Balance: $usdtBalance\n";
         echo "Crypto Balance (BTC): $cryptoBalance\n";
 
-        // Moving average parameters
-        $shortMA = $this->getMovingAverage($symbol, '15m', 5); // Short moving average, 15-minute interval and 5 periods
-        $longMA = $this->getMovingAverage($symbol, '15m', 15); // Long moving average, 15-minute interval and 15 periods
+        // Customizable parameters for strategy optimization
+        $shortMA = $this->getMovingAverage($symbol, '30m', 15);
+        $longMA = $this->getMovingAverage($symbol, '30m', 60);
+        $rsi = $this->calculateRSI($symbol, '30m');
+
 
         echo "Short Moving Average: $shortMA\n";
         echo "Long Moving Average: $longMA\n";
+        echo "RSI: $rsi\n";
 
         $filters = $this->getSymbolFilters($symbol);
         $minQty = null;
@@ -116,7 +154,8 @@ class TradingBotService
         $quantity = floor($quantity / $stepSize) * $stepSize;
         $quantity = number_format($quantity, $precision, '.', '');
 
-        if ($shortMA > $longMA && $usdtBalance >= $investment) {
+        // Conditions to buy
+        if ($shortMA > $longMA && $usdtBalance >= $investment && $rsi < self::RSI_BUY) {
             echo "Attempting to purchase $quantity BTC with $investment USDT\n";
             try {
                 $response = $this->client->newOrder(
@@ -133,7 +172,8 @@ class TradingBotService
             }
         } else {
             echo "No conditions for buying. Checking for selling conditions...\n";
-            if ($cryptoBalance !== null && $cryptoBalance > 0) {
+            // Conditions to sell
+            if ($cryptoBalance !== null && $cryptoBalance > 0 && $rsi > self::RSI_SELL) {
                 $quantity = bcdiv($cryptoBalance, '1', 8); // Amount of cryptocurrency to sell, can change the number of decimal places for greater accuracy
                 $quantity = floor($quantity / $stepSize) * $stepSize;
                 $quantity = number_format($quantity, $precision, '.', '');
@@ -159,7 +199,7 @@ class TradingBotService
     }
 
     // Method to run the bot continuously
-    public function run($symbol, $investment, $intervalSeconds = 60): void
+    public function run($symbol, $investment, $intervalSeconds = 1): void
     {
         while (true) {
             try {
