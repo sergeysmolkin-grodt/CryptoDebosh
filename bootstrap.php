@@ -1,27 +1,16 @@
 <?php
 
-require 'vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
-use Symfony\Component\Console\Application;
 use CryptoDebosh\Application\Services\TradingBotService;
 use CryptoDebosh\Presentation\Commands\TradingBotCommand;
-use Dotenv\Dotenv;
-
-$dotenv = Dotenv::createImmutable(__DIR__);
-$dotenv->load();
+use Symfony\Component\Console\Application;
 
 $config = require __DIR__ . '/config/config.php';
 
-$tradingBotService = new TradingBotService(
-    $config['binance']['api_key'],
-    $config['binance']['secret_key']
-);
+$tradingBotService = new TradingBotService($config['binance']['apiKey'], $config['binance']['secretKey']);
 
-$application = new Application('CryptoDebosh', '1.0.0');
-
+$application = new Application();
 $application->add(new TradingBotCommand($tradingBotService));
 
-try {
-    $application->run();
-} catch (Exception $e) {
-}
+return $application;

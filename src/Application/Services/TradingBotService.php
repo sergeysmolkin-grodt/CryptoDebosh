@@ -16,7 +16,7 @@ class TradingBotService
     {
         $this->key = trim($key);
         $this->secret = trim($secret);
-
+        dd($this->secret, $this->key);
         $guzzleClient = new Client([
             'verify' => false,
             'debug' => true,
@@ -84,7 +84,7 @@ class TradingBotService
             try {
                 $response = $this->client->newOrder(
                     'BTCUSDT',
-                    'SELL',
+                    'BUY',
                     'MARKET',
                     [
                         'quantity' => $quantity

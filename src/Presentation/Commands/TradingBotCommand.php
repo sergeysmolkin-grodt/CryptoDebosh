@@ -2,6 +2,7 @@
 
 namespace CryptoDebosh\Presentation\Commands;
 
+use Binance\Exception\MissingArgumentException;
 use CryptoDebosh\Application\Services\TradingBotService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -11,9 +12,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TradingBotCommand extends Command
 {
-    protected static $defaultName = 'app:trading-bot';
+    protected static string $defaultName = 'app:trading-bot';
 
-    private $tradingBotService;
+    private TradingBotService $tradingBotService;
 
     public function __construct(TradingBotService $tradingBotService)
     {
@@ -21,7 +22,7 @@ class TradingBotCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('app:trading-bot')
@@ -31,6 +32,9 @@ class TradingBotCommand extends Command
             ->addOption('continuous', 'c', InputOption::VALUE_NONE, 'Run the bot continuously');
     }
 
+    /**
+     * @throws MissingArgumentException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $symbol = $input->getArgument('symbol');
