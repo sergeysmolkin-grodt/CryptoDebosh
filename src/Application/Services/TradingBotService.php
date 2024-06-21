@@ -2,214 +2,38 @@
 
 namespace CryptoDebosh\Application\Services;
 
-use Binance\Exception\MissingArgumentException;
 use Binance\Spot;
-use GuzzleHttp\Client;
+use CryptoDebosh\Application\Factories\TradingStrategyFactory;
 
-final class TradingBotService
+class TradingBotService
 {
-    private readonly string $key;
-    private readonly string $secret;
     private Spot $client;
+    private $strategy;
 
-    private const int RSI_BUY = 30;
-
-    private const int RSI_SELL = 70;
-
-    public function __construct($key, $secret)
+    public function __construct($key, $secret, $strategyName)
     {
-        $this->key = trim($key);
-        $this->secret = trim($secret);
-
-        $guzzleClient = new Client([
-            'verify' => false,
-            'debug' => true,
-        ]);
-
         $this->client = new Spot([
-            'key' => $this->key,
-            'secret' => $this->secret,
-            'http_client_handler' => $guzzleClient,
-            'recvWindow' => 60000,
+            'key' => trim($key),
+            'secret' => trim($secret),
         ]);
+
+        $this->strategy = TradingStrategyFactory::create($strategyName, $this->client);
     }
 
-    // Method to retrieve symbol filters such as LOT_SIZE and MIN_NOTIONAL
-    private function getSymbolFilters($symbol)
-    {
-        $exchangeInfo = $this->client->exchangeInfo();
-        foreach ($exchangeInfo['symbols'] as $s) {
-            if ($s['symbol'] === $symbol) {
-                return $s['filters'];
-            }
-        }
-        throw new \Exception("Filters not found for symbol $symbol");
-    }
-
-    // Method to calculate the moving average
-    public function getMovingAverage($symbol, $interval, $limit): float|int
-    {
-        $klines = $this->client->klines($symbol, $interval, ['limit' => $limit]);
-        $sum = 0;
-        foreach ($klines as $kline) {
-            $sum += ($kline[1] + $kline[4]) / 2; // Average price (open + close) / 2
-        }
-        return $sum / $limit; // Moving average
-    }
-
-    // Method to calculate the RSI
-    private function calculateRSI($symbol, $interval, $limit = 14): float
-    {
-        $klines = $this->client->klines($symbol, $interval, ['limit' => $limit + 1]);
-        $gains = 0;
-        $losses = 0;
-
-        for ($i = 1, $iMax = count($klines); $i < $iMax; $i++) {
-            $change = $klines[$i][4] - $klines[$i - 1][4];
-            if ($change > 0) {
-                $gains += $change;
-            } else {
-                $losses += abs($change);
-            }
-        }
-
-        $averageGain = $gains / $limit;
-        $averageLoss = $losses / $limit;
-
-        if ($averageLoss == 0) {
-            return 100;
-        }
-
-        $rs = $averageGain / $averageLoss;
-        $rsi = 100 - (100 / (1 + $rs));
-
-        return $rsi;
-    }
-
-    /**
-     * Method to execute trades based on moving averages and RSI
-     *
-     * @throws MissingArgumentException
-     * @throws \Exception
-     */
     public function trade($symbol, $investment)
     {
-        try {
-            $accountInfo = $this->client->account(['recvWindow' => 60000]);
-        } catch (\Exception $e) {
-            echo "Error fetching account info: " . $e->getMessage() . "\n";
-            return;
-        }
-
-        $balances = $accountInfo['balances'];
-
-        $usdtBalance = null;
-        $cryptoBalance = null;
-        foreach ($balances as $b) {
-            if ($b['asset'] === 'USDT') {
-                $usdtBalance = $b['free'];
-            }
-            if ($b['asset'] === explode('USDT', $symbol)[0]) {
-                $cryptoBalance = $b['free'];
-            }
-        }
-
-        if ($usdtBalance === null) {
-            throw new \Exception("USDT balance not found.");
-        }
-
-        echo "USDT Balance: $usdtBalance\n";
-        echo "Crypto Balance (BTC): $cryptoBalance\n";
-
-        // Customizable parameters for strategy optimization
-        $shortMA = $this->getMovingAverage($symbol, '30m', 15);
-        $longMA = $this->getMovingAverage($symbol, '30m', 60);
-        $rsi = $this->calculateRSI($symbol, '30m');
-
-
-        echo "Short Moving Average: $shortMA\n";
-        echo "Long Moving Average: $longMA\n";
-        echo "RSI: $rsi\n";
-
-        $filters = $this->getSymbolFilters($symbol);
-        $minQty = null;
-        $stepSize = null;
-
-        foreach ($filters as $filter) {
-            if ($filter['filterType'] === 'LOT_SIZE') {
-                $minQty = $filter['minQty'];
-                $stepSize = $filter['stepSize'];
-                echo "Min LOT_SIZE: $minQty, Step Size: $stepSize\n";
-            }
-        }
-
-        $quantity = bcdiv($investment, $shortMA, 8); // Amount of cryptocurrency to buy, can change the number of decimal places for greater accuracy
-
-        if ($quantity < $minQty) {
-            $quantity = $minQty;
-        }
-
-        // Adjusting to step size
-        $precision = log10(1 / $stepSize);
-        $quantity = floor($quantity / $stepSize) * $stepSize;
-        $quantity = number_format($quantity, $precision, '.', '');
-
-        // Conditions to buy
-        if ($shortMA > $longMA && $usdtBalance >= $investment && $rsi < self::RSI_BUY) {
-            echo "Attempting to purchase $quantity BTC with $investment USDT\n";
-            try {
-                $response = $this->client->newOrder(
-                    'BTCUSDT',
-                    'BUY',
-                    'MARKET',
-                    [
-                        'quantity' => $quantity,
-                    ]
-                );
-                echo "Purchased BTC worth $investment USDT. Response: " . json_encode($response) . "\n";
-            } catch (\Exception $e) {
-                echo "Error executing buy order: " . $e->getMessage() . "\n";
-            }
-        } else {
-            echo "No conditions for buying. Checking for selling conditions...\n";
-            // Conditions to sell
-            if ($cryptoBalance !== null && $cryptoBalance > 0 && $rsi > self::RSI_SELL) {
-                $quantity = bcdiv($cryptoBalance, '1', 8); // Amount of cryptocurrency to sell, can change the number of decimal places for greater accuracy
-                $quantity = floor($quantity / $stepSize) * $stepSize;
-                $quantity = number_format($quantity, $precision, '.', '');
-                echo "Attempting to sell $quantity BTC\n";
-                try {
-                    $response = $this->client->newOrder(
-                        'BTCUSDT', // Ensure the symbol is correct and fully specified
-                        'SELL',
-                        'MARKET',
-                        [
-                            'quantity' => $quantity,
-                            'recvWindow' => 60000,
-                        ]
-                    );
-                    echo "Sold all available BTC. Response: " . json_encode($response) . "\n";
-                } catch (\Exception $e) {
-                    echo "Error executing sell order: " . $e->getMessage() . "\n";
-                }
-            } else {
-                echo "Crypto balance not found or zero.\n";
-            }
-        }
+        $this->strategy->execute($symbol, $investment);
     }
 
-    // Method to run the bot continuously
-    public function run($symbol, $investment, $intervalSeconds = 1): void
+    public function run($symbol, $investment, $intervalSeconds = 60): void
     {
         while (true) {
             try {
                 $this->trade($symbol, $investment);
-                // Interval parameter, can be changed to control the frequency of trading conditions checks
-                sleep($intervalSeconds);
             } catch (\Exception $e) {
                 echo "Error in trading loop: " . $e->getMessage() . "\n";
-                sleep($intervalSeconds); // Delay on error to avoid spamming
             }
+            sleep($intervalSeconds);
         }
     }
 }
