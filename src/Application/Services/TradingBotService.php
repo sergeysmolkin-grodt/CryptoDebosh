@@ -25,8 +25,29 @@ class TradingBotService
         $this->client = new Spot([
             'key' => $this->key,
             'secret' => $this->secret,
+            'http_client_handler' => $guzzleClient,
             'recvWindow' => 60000,
         ]);
+    }
+
+    private function getMinOrderSize($symbol)
+    {
+        $exchangeInfo = $this->client->exchangeInfo();
+        foreach ($exchangeInfo['symbols'] as $s) {
+            if ($s['symbol'] === $symbol) {
+                foreach ($s['filters'] as $filter) {
+                    if ($filter['filterType'] === 'LOT_SIZE') {
+                        return $filter['minQty'];
+                    }
+                }
+            }
+        }
+        throw new \Exception("LOT_SIZE filter not found for symbol $symbol");
+    }
+
+    private function roundToLotSize($quantity, $minQty)
+    {
+        return bcmul(bcdiv($quantity, $minQty, 0), $minQty, 8);
     }
 
     public function getMovingAverage($symbol, $interval, $limit): float|int
@@ -41,6 +62,7 @@ class TradingBotService
 
     /**
      * @throws MissingArgumentException
+     * @throws \Exception
      */
     public function trade($symbol, $investment)
     {
@@ -77,8 +99,11 @@ class TradingBotService
         echo "Short Moving Average: $shortMA\n";
         echo "Long Moving Average: $longMA\n";
 
+        $minOrderSize = $this->getMinOrderSize($symbol);
+        $quantity = bcdiv($investment, $shortMA, 8);
+        $quantity = $this->roundToLotSize($quantity, $minOrderSize);
+
         if ($usdtBalance >= $investment) {
-            $quantity = bcdiv($investment, $shortMA, 6);
             echo "Attempting to purchase $quantity BTC with $investment USDT\n";
             try {
                 $response = $this->client->newOrder(
@@ -86,7 +111,7 @@ class TradingBotService
                     'BUY',
                     'MARKET',
                     [
-                        'quantity' => $quantity
+                        'quantity' => $quantity,
                     ]
                 );
                 echo "Purchased BTC worth $investment USDT. Response: " . json_encode($response) . "\n";
@@ -96,7 +121,7 @@ class TradingBotService
         } else {
             echo "No conditions for buying. Checking for selling conditions...\n";
             if ($cryptoBalance !== null && $cryptoBalance > 0) {
-                $quantity = bcdiv($cryptoBalance, '1', 6);
+                $quantity = $this->roundToLotSize($cryptoBalance, $minOrderSize);
                 echo "Attempting to sell $quantity BTC\n";
                 try {
                     $response = $this->client->newOrder(
@@ -104,7 +129,7 @@ class TradingBotService
                         'SELL',
                         'MARKET',
                         [
-                            'quantity' => $quantity
+                            'quantity' => $quantity,
                         ]
                     );
                     echo "Sold all available BTC. Response: " . json_encode($response) . "\n";
