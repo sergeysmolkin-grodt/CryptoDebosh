@@ -1,2 +1,1 @@
-﻿# CryptoDebosh
-MOST POWERFUL AND EARNING CRYPTO BOT
+﻿
