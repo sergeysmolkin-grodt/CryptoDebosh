@@ -26,7 +26,6 @@ class TradingBotService
             'key' => $this->key,
             'secret' => $this->secret,
             'recvWindow' => 60000,
-
         ]);
     }
 
