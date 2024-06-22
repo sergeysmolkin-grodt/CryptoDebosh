@@ -50,3 +50,5 @@ services:
         tags: ['console.command']
         arguments:
             $tradingBotService: '@App\Application\Services\TradingBotService'
+
+    App\Shared\Utils\DateFormatter: ~
