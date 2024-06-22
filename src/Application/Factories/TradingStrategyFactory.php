@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Factories;
 
+use App\Application\Contracts\TradingStrategyInterface;
 use Binance\Spot;
 
 class TradingStrategyFactory

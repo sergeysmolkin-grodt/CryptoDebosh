@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace CryptoDebosh\Presentation\Commands;
+namespace App\Presentation\Commands;
 
 
-use CryptoDebosh\Application\Services\TradeService;
+use App\Application\Services\TradeService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

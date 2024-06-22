@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Application\Services;
 
 use App\Application\Factories\TradingStrategyFactory;
+use Binance\Spot;
+use GuzzleHttp\Client;
 
 class TradingBotService
 {
@@ -13,12 +15,13 @@ class TradingBotService
     private Spot $client;
     private $strategy;
 
-    public function __construct(string $key, string $secret)
+    public function __construct(string $key, string $secret, $strategy)
     {
         $this->key = $key;
         $this->secret = $secret;
+        $this->strategy = $strategy;
 
-        $guzzleClient = new \GuzzleHttp\Client([
+        $guzzleClient = new Client([
             'verify' => false,
             'debug' => true,
         ]);

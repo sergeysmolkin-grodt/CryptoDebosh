@@ -1,23 +1,33 @@
 services:
-    # default configuration for services in *this* file
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        autowire: true
+        autoconfigure: true
+        public: false
 
-    # Makes classes in src/ available to be used as services
-    # This creates a service per class whose id is the fully-qualified class name
-    App\:
-        resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Entity,Tests,Kernel.php}'
+    # Define the GuzzleHttp\Client service
+    guzzle.client:
+        class: GuzzleHttp\Client
+        arguments:
+            - { verify: false, debug: true }
 
-    # Controllers are imported separately to make sure services can be injected
-    # as action arguments even if you make your services.php file private.
-    App\Controller\:
-        resource: '../src/Controller'
-        tags: ['controller.service_arguments']
+    # Define the BinanceSpotFactory
+    App\Infrastructure\Factory\BinanceSpotFactory: ~
 
-    CryptoDebosh\Application\Services\TradingBotService:
+    # Define the Binance\Spot service using the factory
+    Binance\Spot:
+        factory: ['App\Infrastructure\Factory\BinanceSpotFactory', 'create']
         arguments:
             $key: '%env(BINANCE_API_KEY)%'
             $secret: '%env(BINANCE_SECRET_KEY)%'
-            $strategy: '@App\Application\Services\TradingStrategies\MovingAverageStrategy'
+
+    # Define TradingBotService with the correct strategy
+    App\Application\Services\TradingBotService:
+        arguments:
+            $key: '%env(BINANCE_API_KEY)%'
+            $secret: '%env(BINANCE_SECRET_KEY)%'
+            $strategy: '@App\Application\Services\MovingAverageStrategy'
+
+    # Define MovingAverageStrategy
+    App\Application\Services\MovingAverageStrategy:
+        arguments:
+            $client: '@Binance\Spot'

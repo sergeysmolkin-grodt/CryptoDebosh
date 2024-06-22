@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CryptoDebosh\Infrastructure\Services;
+namespace App\Infrastructure\Services;
 
 use Binance\Spot;
 use GuzzleHttp\Client;

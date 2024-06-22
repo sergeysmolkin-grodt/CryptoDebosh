@@ -1,8 +1,9 @@
 <?php
 
-namespace CryptoDebosh\Presentation\Commands;
+namespace App\Presentation\Commands;
 
-use CryptoDebosh\Application\Services\BlockchainService;
+
+use App\Application\Services\BlockchainService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

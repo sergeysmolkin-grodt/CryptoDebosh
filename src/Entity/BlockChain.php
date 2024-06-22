@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CryptoDebosh\Domain\Entities;
+namespace App\Entity;
 
 class Blockchain
 {
