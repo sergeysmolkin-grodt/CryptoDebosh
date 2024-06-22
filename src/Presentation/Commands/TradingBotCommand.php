@@ -32,7 +32,7 @@ class TradingBotCommand extends Command
             ->addOption('strategy', null, InputOption::VALUE_REQUIRED, 'The strategy to use');
     }
 
-    // src/Presentation/Commands/TradingBotCommand.php
+
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
