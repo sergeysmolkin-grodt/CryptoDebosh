@@ -1,10 +1,10 @@
 # config/routes.yaml
 
-admin:
-    resource: ../src/Presentation/Controller/Admin/
-    type: annotation
+trading_bot:
+  path: /trading-bot
+  controller: App\Controller\TradingBotController::index
 
-# Другие маршруты
-index:
-    path: /
-    controller: App\Controller\DefaultController::index
+trading_bot_run:
+  path: /trading-bot/run
+  controller: App\Controller\TradingBotController::run
+  methods: [POST]

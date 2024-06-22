@@ -39,12 +39,6 @@ services:
             $client: '@App\Infrastructure\Services\BinanceSpot'
             $strategy: '@App\Application\Services\MovingAverageStrategy'
 
-    # Define the TradingBotController as a service
-    App\Controller\TradingBotController:
-        arguments:
-            $tradingBotService: '@App\Application\Services\TradingBotService'
-            $strategyFactory: '@App\Application\Factories\TradingStrategyFactory'
-
     # Bind the TradingBotCommand service
     App\Presentation\Commands\TradingBotCommand:
         tags: ['console.command']

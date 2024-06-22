@@ -13,7 +13,7 @@ final class HttpClientAdapter
     /**
      * @var Client
      */
-    private $client;
+    private Client $client;
 
     /**
      * HttpClientAdapter constructor.

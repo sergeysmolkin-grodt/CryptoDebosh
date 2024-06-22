@@ -1,3 +1,4 @@
-admin:
-  resource: '../src/Presentation/Controller/Admin/'
-  type: annotation
+admin_users:
+  path: /admin/users
+  controller: App\Presentation\Controller\Admin\UserController::index
+  methods: GET
