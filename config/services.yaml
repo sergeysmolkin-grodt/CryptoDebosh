@@ -62,6 +62,6 @@ services:
         arguments:
             $client: '@GuzzleHttp\Client'
 
-    App\Security\AdminAccessVoter:
+    App\Infrastructure\Security\AdminAccessVoter:
         tags:
             - { name: security.voter }

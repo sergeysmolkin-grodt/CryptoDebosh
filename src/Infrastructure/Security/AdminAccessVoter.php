@@ -1,27 +1,43 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Infrastructure\Security;
 
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class AdminAccessVoter
+class AdminAccessVoter implements VoterInterface
 {
-    protected function supports(string $attribute, $subject): bool
+    private const ADMIN_ACCESS = 'ADMIN_ACCESS';
+
+    public function supportsAttribute(string $attribute): bool
     {
-        return in_array($attribute, ['ROLE_ADMIN']);
+        return $attribute === self::ADMIN_ACCESS;
     }
 
-    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
+    public function supportsType(string $subjectType): bool
     {
-        $user = $token->getUser();
-        if (!$user instanceof UserInterface) {
-            return false;
+        return true;
+    }
+
+    public function vote(TokenInterface $token, $subject, array $attributes): int
+    {
+        foreach ($attributes as $attribute) {
+            if (!$this->supportsAttribute($attribute)) {
+                continue;
+            }
+
+            $user = $token->getUser();
+
+            if (!$user instanceof UserInterface) {
+                return VoterInterface::ACCESS_DENIED;
+            }
+
+            return in_array('ROLE_ADMIN', $user->getRoles(), true)
+                ? VoterInterface::ACCESS_GRANTED
+                : VoterInterface::ACCESS_DENIED;
         }
 
-        return in_array('ROLE_ADMIN', $user->getRoles());
+        return VoterInterface::ACCESS_ABSTAIN;
     }
 }
