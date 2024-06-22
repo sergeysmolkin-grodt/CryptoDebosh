@@ -5,17 +5,17 @@ services:
         public: false
 
     # Define the GuzzleHttp\Client service
-    guzzle.client:
-        class: GuzzleHttp\Client
+    GuzzleHttp\Client:
         arguments:
             - { verify: false, debug: true }
 
     # Define the BinanceSpotFactory
-    App\Infrastructure\Factory\BinanceSpotFactory: ~
+    App\Infrastructure\Factory\BinanceSpotFactory:
+        class: App\Infrastructure\Factory\BinanceSpotFactory
 
-    # Define the Binance\Spot service using the factory
+    # Define Binance\Spot service using the factory
     Binance\Spot:
-        factory: ['App\Infrastructure\Factory\BinanceSpotFactory', 'create']
+        factory: ['@App\Infrastructure\Factory\BinanceSpotFactory', 'create']
         arguments:
             $key: '%env(BINANCE_API_KEY)%'
             $secret: '%env(BINANCE_SECRET_KEY)%'
@@ -32,6 +32,7 @@ services:
         arguments:
             $client: '@Binance\Spot'
 
+    # Define the command
     App\Presentation\Commands\TradingBotCommand:
         tags:
             - { name: 'console.command' }
