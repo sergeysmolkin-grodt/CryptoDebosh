@@ -1,10 +1,10 @@
+<!-- templates/admin/users.html.twig -->
 {% extends 'base.html.twig' %}
 
-{% block title %}Users{% endblock %}
+{% block title %}Users List{% endblock %}
 
 {% block body %}
-    <h1>All Users</h1>
-
+    <h1>Users List</h1>
     <table>
         <thead>
         <tr>
@@ -12,7 +12,6 @@
             <th>Name</th>
             <th>Email</th>
             <th>Balance</th>
-            <th>Address</th>
             <th>Roles</th>
             <th>Created At</th>
         </tr>
@@ -24,9 +23,8 @@
                 <td>{{ user.name }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.balance }}</td>
-                <td>{{ user.address }}</td>
-                <td>{{ user.roles | join(', ') }}</td>
-                <td>{{ user.createdAt | date('Y-m-d H:i:s') }}</td>
+                <td>{{ user.roles|join(', ') }}</td>
+                <td>{{ user.createdAt|date('Y-m-d H:i:s') }}</td>
             </tr>
         {% endfor %}
         </tbody>

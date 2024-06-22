@@ -6,11 +6,13 @@ use App\Infrastructure\Persistence\Doctrine\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * @Route("/admin", name="admin_")
+ */
 class UserController extends AbstractController
 {
-    private UserRepository $userRepository;
+    private $userRepository;
 
     public function __construct(UserRepository $userRepository)
     {
@@ -18,17 +20,13 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/admin/users", name="admin_users")
+     * @Route("/users", name="users")
      */
-    public function index(): Response
+    public function listUsers(): Response
     {
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            throw new AccessDeniedException('Access denied.');
-        }
+        $users = $this->userRepository->findAll();
 
-        $users = $this->userRepository->findAllUsers();
-
-        return $this->render('admin/users/index.html.twig', [
+        return $this->render('admin/users.html.twig', [
             'users' => $users,
         ]);
     }
