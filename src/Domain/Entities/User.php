@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Entity;
+namespace App\Domain\Entities;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @ORM\Entity(repositoryClass="App\Infrastructure\Persistence\Doctrine\UserRepository")
  * @ORM\Table(name="users")
  */
 class User

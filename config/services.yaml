@@ -59,3 +59,8 @@ services:
     App\Infrastructure\Security\AdminAccessVoter:
         tags:
             - { name: security.voter }
+
+    App\Presentation\Controller\Admin\UserAdmin:
+        arguments: [ ~, App\Domain\Entities\User, ~ ]
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: User }

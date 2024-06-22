@@ -8,3 +8,8 @@ trading_bot_run:
   path: /trading-bot/run
   controller: App\Controller\TradingBotController::run
   methods: [POST]
+
+
+admin:
+  resource: '@SonataAdminBundle/Resources/config/routing/sonata_admin.xml'
+  prefix: /admin

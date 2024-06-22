@@ -1,10 +1,29 @@
 sonata_admin:
     title: 'Sonata Admin'
+    title_logo: '/path/to/logo.png'
     dashboard:
         blocks:
             - { type: sonata.admin.block.admin_list, position: left }
 
 sonata_block:
+    default_contexts: [sonata_page_bundle]
     blocks:
+        # Add the AdminBundle block
         sonata.admin.block.admin_list:
             contexts: [admin]
+
+doctrine:
+    dbal:
+        # Configure your database connection here
+        driver: 'pdo_mysql'
+        host: '%env(resolve:DATABASE_HOST)%'
+        port: '%env(resolve:DATABASE_PORT)%'
+        dbname: '%env(resolve:DATABASE_NAME)%'
+        user: '%env(resolve:DATABASE_USER)%'
+        password: '%env(resolve:DATABASE_PASSWORD)%'
+        charset: UTF8
+
+    orm:
+        auto_generate_proxy_classes: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore
+        auto_mapping: true
