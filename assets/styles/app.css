@@ -1,3 +1,59 @@
-body {
-    background-color: skyblue;
+/* assets/styles/app.css */
+
+/* Mobile Navigation */
+@media only screen and (max-width: 63.9375rem) {
+    body.cs-open {
+        overflow: hidden;
+    }
+    body.scroll #cs-navigation {
+        width: 100%;
+        max-width: 100%;
+        top: 0;
+    }
+    /* Add the rest of your CSS styles here... */
+    /* ... */
+}
+
+/* Tablet - 768px */
+@media only screen and (min-width: 48rem) {
+    #cs-navigation .cs-contact-group {
+        display: block;
+    }
+}
+
+/* Desktop - 1024px */
+@media only screen and (min-width: 64rem) {
+    body.scroll #cs-navigation {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 0;
+        top: 0;
+    }
+    #cs-navigation {
+        width: 94%;
+        max-width: 90rem;
+        height: 6rem;
+        box-sizing: border-box;
+        padding: clamp(0.75rem, 2vw, 1.5rem) 0;
+        background-color: #fff;
+        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+        border-radius: clamp(0.75rem, 2vw, 1.5rem);
+        display: flex;
+        align-items: center;
+        position: fixed;
+        top: 2rem;
+        left: 50%;
+        z-index: 10000;
+        transform: translateX(-50%);
+        transition: top 0.3s, border-radius 0.3s, width 0.3s, max-width 0.3s;
+    }
+    /* Add the rest of your CSS styles here... */
+    /* ... */
+}
+
+/* Large Desktop - 1300px */
+@media only screen and (min-width: 81.25rem) {
+    #cs-navigation .cs-social {
+        display: flex;
+    }
 }
