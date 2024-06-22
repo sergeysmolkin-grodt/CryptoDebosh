@@ -51,4 +51,13 @@ services:
         arguments:
             $tradingBotService: '@App\Application\Services\TradingBotService'
 
+    # Utils
     App\Shared\Utils\DateFormatter: ~
+
+    # Value Objects
+    App\Domain\ValueObjects\Trading\InvestmentAmount: ~
+
+    #Adapters
+    App\Shared\Adapters\HttpClientAdapter:
+        arguments:
+            $client: '@GuzzleHttp\Client'
