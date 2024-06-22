@@ -9,18 +9,8 @@ use GuzzleHttp\Client;
 
 class BinanceSpotFactory
 {
-    public function create(string $key, string $secret): Spot
+    public static function create(string $apiKey, string $secretKey, Client $httpClientHandler): Spot
     {
-        $guzzleClient = new Client([
-            'verify' => false,
-            'debug' => true,
-        ]);
-
-        return new Spot([
-            'key' => $key,
-            'secret' => $secret,
-            'http_client_handler' => $guzzleClient,
-            'recvWindow' => 60000,
-        ]);
+        return new Spot($apiKey, $secretKey, $httpClientHandler);
     }
 }
