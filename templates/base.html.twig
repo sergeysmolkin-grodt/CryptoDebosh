@@ -2,27 +2,15 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Welcome!{% endblock %}</title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <title>{% block title %}Welcome{% endblock %}</title>
+    {{ encore_entry_link_tags('app') }}
+    {{ encore_entry_link_tags('global') }}
 </head>
 <body>
-<header>
-    <h1>My Trading Bot</h1>
-</header>
-
-<nav>
-    <ul>
-        <li><a href="{{ path('trading_bot') }}">Home</a></li>
-        <!-- Add more links as needed -->
-    </ul>
-</nav>
-
-<main>
+{% include 'navigation.html.twig' %}
+<div class="content">
     {% block body %}{% endblock %}
-</main>
-
-<footer>
-    <p>&copy; 2024 My Trading Bot</p>
-</footer>
+</div>
+{{ encore_entry_script_tags('app') }}
 </body>
 </html>
