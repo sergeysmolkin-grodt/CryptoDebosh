@@ -177,7 +177,6 @@
       <path value="$PROJECT_DIR$/vendor/sonata-project/form-extensions" />
       <path value="$PROJECT_DIR$/vendor/sonata-project/exporter" />
       <path value="$PROJECT_DIR$/vendor/sonata-project/doctrine-orm-admin-bundle" />
-      <path value="$PROJECT_DIR$/vendor/doctrine/annotations" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.3" />
