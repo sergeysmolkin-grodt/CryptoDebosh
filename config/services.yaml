@@ -31,3 +31,9 @@ services:
     App\Application\Services\MovingAverageStrategy:
         arguments:
             $client: '@Binance\Spot'
+
+    App\Presentation\Commands\TradingBotCommand:
+        tags:
+            - { name: 'console.command' }
+        arguments:
+            $tradingBotService: '@App\Application\Services\TradingBotService'
