@@ -1,8 +1,28 @@
+{# templates/tradings_bot/index.html.twig #}
+
 {% extends 'base.html.twig' %}
 
 {% block title %}Trading Bot{% endblock %}
 
 {% block body %}
-    <h1>{{ controller_name }}</h1>
-    <p>Welcome to the Trading Bot Interface!</p>
+    <h1>Trading Bot Interface</h1>
+
+    <form action="{{ path('trading_bot_run') }}" method="POST">
+        <div>
+            <label for="symbol">Symbol:</label>
+            <input type="text" id="symbol" name="symbol" required>
+        </div>
+        <div>
+            <label for="investment">Investment (USDT):</label>
+            <input type="number" id="investment" name="investment" step="0.01" required>
+        </div>
+        <div>
+            <label for="strategy">Strategy:</label>
+            <select id="strategy" name="strategy" required>
+                <option value="moving_average">Moving Average</option>
+                <!-- Add other strategies here -->
+            </select>
+        </div>
+        <button type="submit">Run Trading Bot</button>
+    </form>
 {% endblock %}

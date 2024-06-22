@@ -6,35 +6,47 @@ services:
 
     # Define the GuzzleHttp\Client service
     GuzzleHttp\Client:
+        class: GuzzleHttp\Client
         arguments:
-            - { verify: false, debug: true }
+            - { verify: false }
 
-    # Define the BinanceSpotFactory
-    App\Infrastructure\Factory\BinanceSpotFactory:
-        class: App\Infrastructure\Factory\BinanceSpotFactory
-
-    # Define Binance\Spot service using the factory
-    Binance\Spot:
-        factory: ['@App\Infrastructure\Factory\BinanceSpotFactory', 'create']
+    # Define the BinanceSpot service
+    App\Infrastructure\Services\BinanceSpot:
+        class: App\Infrastructure\Services\BinanceSpot
         arguments:
             $key: '%env(BINANCE_API_KEY)%'
             $secret: '%env(BINANCE_SECRET_KEY)%'
+            $httpClient: '@GuzzleHttp\Client'
 
-    # Define TradingBotService with the correct strategy
+    # Define strategies
+    App\Application\Services\MovingAverageStrategy: ~
+    # Add other strategies here if needed
+    # App\Application\Services\AnotherStrategy: ~
+
+    # Define the TradingStrategyFactory
+    App\Application\Factories\TradingStrategyFactory:
+        arguments:
+            $strategies:
+                moving_average: '@App\Application\Services\MovingAverageStrategy'
+                # Add other strategies here if needed
+                # another_strategy: '@App\Application\Services\AnotherStrategy'
+
+    # Define the TradingBotService with the correct strategy
     App\Application\Services\TradingBotService:
         arguments:
             $key: '%env(BINANCE_API_KEY)%'
             $secret: '%env(BINANCE_SECRET_KEY)%'
+            $client: '@App\Infrastructure\Services\BinanceSpot'
             $strategy: '@App\Application\Services\MovingAverageStrategy'
 
-    # Define MovingAverageStrategy
-    App\Application\Services\MovingAverageStrategy:
+    # Define the TradingBotController as a service
+    App\Controller\TradingBotController:
         arguments:
-            $client: '@Binance\Spot'
+            $tradingBotService: '@App\Application\Services\TradingBotService'
+            $strategyFactory: '@App\Application\Factories\TradingStrategyFactory'
 
-    # Define the command
+    # Bind the TradingBotCommand service
     App\Presentation\Commands\TradingBotCommand:
-        tags:
-            - { name: 'console.command' }
+        tags: ['console.command']
         arguments:
             $tradingBotService: '@App\Application\Services\TradingBotService'

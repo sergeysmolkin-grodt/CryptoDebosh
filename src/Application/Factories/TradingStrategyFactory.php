@@ -1,19 +1,27 @@
 <?php
 
-declare(strict_types=1);
+// src/Application/Factories/TradingStrategyFactory.php
 
 namespace App\Application\Factories;
 
 use App\Application\Contracts\TradingStrategyInterface;
-use Binance\Spot;
+use InvalidArgumentException;
 
 class TradingStrategyFactory
 {
-    public static function create($strategyName, Spot $client): TradingStrategyInterface
+    private array $strategies;
+
+    public function __construct(array $strategies)
     {
-        return match ($strategyName) {
-            'moving_average' => new MovingAverageStrategy($client),
-            default => throw new \Exception("Unknown trading strategy: $strategyName"),
-        };
+        $this->strategies = $strategies;
+    }
+
+    public function create(string $strategyName): TradingStrategyInterface
+    {
+        if (!isset($this->strategies[$strategyName])) {
+            throw new InvalidArgumentException("Strategy {$strategyName} not found.");
+        }
+
+        return $this->strategies[$strategyName];
     }
 }

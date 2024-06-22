@@ -2,18 +2,17 @@
 
 namespace App\Application\Services;
 
+use App\Infrastructure\Services\BinanceSpot;
 use App\Application\Contracts\TradingStrategyInterface;
-use App\Application\Factories\TradingStrategyFactory;
-use Binance\Spot;
 
 class TradingBotService
 {
     private string $key;
     private string $secret;
-    private Spot $client;
+    private BinanceSpot $client; // Updated to BinanceSpot
     private TradingStrategyInterface $strategy;
 
-    public function __construct(string $key, string $secret, Spot $client, TradingStrategyInterface $strategy)
+    public function __construct(string $key, string $secret, BinanceSpot $client, TradingStrategyInterface $strategy)
     {
         $this->key = $key;
         $this->secret = $secret;
@@ -21,10 +20,14 @@ class TradingBotService
         $this->strategy = $strategy;
     }
 
-
     public function trade(string $symbol, float $investment): void
     {
         $this->strategy->execute($symbol, $investment);
+    }
+
+    public function setStrategy(TradingStrategyInterface $strategy): void
+    {
+        $this->strategy = $strategy;
     }
 
     public function run(string $symbol, float $investment, int $intervalSeconds): void
@@ -37,6 +40,6 @@ class TradingBotService
 
     public function stop(): void
     {
-        // Реализация остановки бота
+        // Implementation to stop the bot
     }
 }

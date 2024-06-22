@@ -4,14 +4,14 @@
 
 namespace App\Application\Services;
 
-use Binance\Spot;
 use App\Application\Contracts\TradingStrategyInterface;
+use App\Infrastructure\Services\BinanceSpot;
 
 class MovingAverageStrategy implements TradingStrategyInterface
 {
-    private Spot $client;
+    private BinanceSpot $client;
 
-    public function __construct(Spot $client)
+    public function __construct(BinanceSpot $client)
     {
         $this->client = $client;
     }
