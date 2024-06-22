@@ -61,3 +61,7 @@ services:
     App\Shared\Adapters\HttpClientAdapter:
         arguments:
             $client: '@GuzzleHttp\Client'
+
+    App\Security\AdminAccessVoter:
+        tags:
+            - { name: security.voter }

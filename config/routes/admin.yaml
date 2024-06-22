@@ -1,0 +1,4 @@
+admin_users:
+  path: /admin/users
+  controller: App\Presentation\Controller\Admin\UserController::index
+  methods: GET
