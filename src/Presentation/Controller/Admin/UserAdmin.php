@@ -25,30 +25,39 @@ final class UserAdmin extends AbstractAdmin
 
     protected function configureFormFields(FormMapper $form): void
     {
-        // Add form fields here
-        $form->add('name', 'text');
-        $form->add('email', 'text');
-        $form->add('balance', 'number');
-        // Add more fields as necessary
+        $form->add('name', 'text')
+            ->add('email', 'email')
+            ->add('balance', 'number')
+            ->add('address', 'text')
+            ->add('roles', 'choice', [
+                'choices' => [
+                    'Admin' => 'ROLE_ADMIN',
+                    'User' => 'ROLE_USER',
+                ],
+                'multiple' => true,
+                'expanded' => true,
+            ]);
     }
 
     protected function configureListFields(ListMapper $list): void
     {
-        // Add list fields here
-        $list->addIdentifier('id');
-        $list->add('name');
-        $list->add('email');
-        $list->add('balance');
-        // Add more fields as necessary
+        $list->addIdentifier('id')
+            ->add('name')
+            ->add('email')
+            ->add('balance')
+            ->add('address')
+            ->add('roles')
+            ->add('createdAt');
     }
 
     protected function configureShowFields(ShowMapper $show): void
     {
-        // Add show fields here
-        $show->add('id');
-        $show->add('name');
-        $show->add('email');
-        $show->add('balance');
-        // Add more fields as necessary
+        $show->add('id')
+            ->add('name')
+            ->add('email')
+            ->add('balance')
+            ->add('address')
+            ->add('roles')
+            ->add('createdAt');
     }
 }
