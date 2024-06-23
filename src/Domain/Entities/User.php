@@ -2,7 +2,7 @@
 
 namespace App\Domain\Entities;
 
-use Doctrine\DBAL\Types\Types;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -19,12 +19,12 @@ class User
     private int $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=100)
      */
     private string $name;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @ORM\Column(type="string", length=100, unique=true)
      */
     private string $email;
 
@@ -39,28 +39,29 @@ class User
     private string $address;
 
     /**
-     * @ORM\Column(type="simple_array")
+     * @ORM\Column(type="json")
      */
-    private array $roles;
+    private array $roles = [];
 
     /**
      * @ORM\Column(type="datetime")
      */
-    private \DateTime $createdAt;
+    private DateTime $createdAt;
 
     /**
-     * @ORM\Column(type="json", nullable=true)
+     * @ORM\Column(type="json")
      */
     private array $transactionHistory = [];
 
-    public function __construct()
+    public function __construct(string $name, string $email, float $balance, string $address, array $roles, DateTime $createdAt)
     {
-        $this->createdAt = new \DateTime();
-        $this->roles = [];
-        $this->transactionHistory = [];
+        $this->name = $name;
+        $this->email = $email;
+        $this->balance = $balance;
+        $this->address = $address;
+        $this->roles = $roles;
+        $this->createdAt = $createdAt;
     }
-
-    // Getters and setters...
 
     public function getId(): int
     {
@@ -72,21 +73,9 @@ class User
         return $this->name;
     }
 
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-        return $this;
-    }
-
     public function getEmail(): string
     {
         return $this->email;
-    }
-
-    public function setEmail(string $email): self
-    {
-        $this->email = $email;
-        return $this;
     }
 
     public function getBalance(): float
@@ -94,21 +83,9 @@ class User
         return $this->balance;
     }
 
-    public function setBalance(float $balance): self
-    {
-        $this->balance = $balance;
-        return $this;
-    }
-
     public function getAddress(): string
     {
         return $this->address;
-    }
-
-    public function setAddress(string $address): self
-    {
-        $this->address = $address;
-        return $this;
     }
 
     public function getRoles(): array
@@ -116,13 +93,7 @@ class User
         return $this->roles;
     }
 
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
-        return $this;
-    }
-
-    public function getCreatedAt(): \DateTime
+    public function getCreatedAt(): DateTime
     {
         return $this->createdAt;
     }
@@ -132,9 +103,64 @@ class User
         return $this->transactionHistory;
     }
 
-    public function setTransactionHistory(array $transactionHistory): self
+    public function setBalance(float $balance): void
     {
-        $this->transactionHistory = $transactionHistory;
-        return $this;
+        $this->balance = $balance;
+    }
+
+    public function setAddress(string $address): void
+    {
+        $this->address = $address;
+    }
+
+    public function setRoles(array $roles): void
+    {
+        $this->roles = $roles;
+    }
+
+    public function increaseBalance(float $amount): void
+    {
+        $this->balance += $amount;
+        $this->addTransaction('credit', $amount);
+    }
+
+    public function decreaseBalance(float $amount): void
+    {
+        if ($amount > $this->balance) {
+            throw new \Exception('Insufficient balance.');
+        }
+        $this->balance -= $amount;
+        $this->addTransaction('debit', $amount);
+    }
+
+    private function addTransaction(string $type, float $amount): void
+    {
+        $this->transactionHistory[] = [
+            'type' => $type,
+            'amount' => $amount,
+            'date' => new DateTime()
+        ];
+    }
+
+    public function addRole(string $role): void
+    {
+        if (!in_array($role, $this->roles, true)) {
+            $this->roles[] = $role;
+        }
+    }
+
+    public function removeRole(string $role): void
+    {
+        $this->roles = array_filter($this->roles, fn($r) => $r !== $role);
+    }
+
+    public function getFullName(): string
+    {
+        return $this->name;
+    }
+
+    public function hasRole(string $role): bool
+    {
+        return in_array($role, $this->roles, true);
     }
 }

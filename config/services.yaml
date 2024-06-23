@@ -12,11 +12,16 @@ services:
         arguments:
             $registry: '@doctrine'
 
-
-    # Загружаем сервисы из определенных папок
     App\Domain\Entities\:
         resource: '../src/Domain/Entities'
         public: true
+        autowire: false
+        autoconfigure: false
+
+    App\Presentation\Controller\Admin\UserAdmin:
+        arguments: [ ~, App\Domain\Entities\User, ~ ]
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: User }
 
     # Define the GuzzleHttp\Client service
     GuzzleHttp\Client:
@@ -73,7 +78,6 @@ services:
     App\Infrastructure\Security\AdminAccessVoter:
         tags:
             - { name: security.voter }
-
 
 
     admin.user:

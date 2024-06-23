@@ -15,11 +15,6 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
-    /**
-     *
-     * @param string $email
-     * @return User|null
-     */
     public function findByEmail(string $email): ?User
     {
         return $this->createQueryBuilder('u')
@@ -28,6 +23,7 @@ class UserRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
 
     /**
      *
