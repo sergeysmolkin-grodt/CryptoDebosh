@@ -2,7 +2,21 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
-        public: false
+
+    App\:
+        resource: '../src/*'
+        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+    App\Infrastructure\Persistence\Doctrine\UserRepository:
+        class: App\Infrastructure\Persistence\Doctrine\UserRepository
+        arguments:
+            $registry: '@doctrine'
+
+
+    # Загружаем сервисы из определенных папок
+    App\Domain\Entities\:
+        resource: '../src/Domain/Entities'
+        public: true
 
     # Define the GuzzleHttp\Client service
     GuzzleHttp\Client:

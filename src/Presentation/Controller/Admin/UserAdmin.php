@@ -8,6 +8,7 @@ use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 
+//TODO replace Admin folder to Web folder
 final class UserAdmin extends AbstractAdmin
 {
     public $baseRouteName = 'admin_user';

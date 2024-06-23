@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Application\DataTransferObjects\Convertors;
 
 use App\Application\DataTransferObjects\User\UserDTO;
-use App\Entity\User;
+use App\Domain\Entities\User;
+
 
 class UserDTOConverter
 {

@@ -27,7 +27,6 @@
         "symfony/flex": "^2.4",
         "symfony/form": "7.1.*",
         "symfony/framework-bundle": "7.1.*",
-
         "symfony/http-client": "7.1.*",
         "symfony/intl": "7.1.*",
         "symfony/mailer": "7.1.*",
@@ -86,6 +85,9 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd",
             "importmap:install": "symfony-cmd"
         },
+        "post-autoload-dump": [
+            "Symfony\\Component\\HttpKernel\\Kernel::bootEnvironment"
+        ],
         "post-install-cmd": [
             "@auto-scripts"
         ],
@@ -103,6 +105,7 @@
         }
     },
     "require-dev": {
+        "roave/security-advisories": "dev-latest",
         "phpunit/phpunit": "^9.5",
         "symfony/browser-kit": "7.1.*",
         "symfony/css-selector": "7.1.*",
