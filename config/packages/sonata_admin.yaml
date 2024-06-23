@@ -4,6 +4,9 @@ sonata_admin:
     dashboard:
         blocks:
             - { type: sonata.admin.block.admin_list, position: left }
+    templates:
+        list: '@SonataAdmin/CRUD/list.html.twig'
+        dashboard: '@SonataAdmin/Core/dashboard.html.twig'
 
 sonata_block:
     default_contexts: [sonata_page_bundle]

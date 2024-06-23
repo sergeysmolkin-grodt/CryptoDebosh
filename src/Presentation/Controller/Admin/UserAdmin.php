@@ -3,6 +3,7 @@
 namespace App\Presentation\Controller\Admin;
 
 use Sonata\AdminBundle\Admin\AbstractAdmin;
+use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Show\ShowMapper;
@@ -50,6 +51,7 @@ final class UserAdmin extends AbstractAdmin
             ->add('roles')
             ->add('createdAt');
     }
+
 
     protected function configureShowFields(ShowMapper $show): void
     {

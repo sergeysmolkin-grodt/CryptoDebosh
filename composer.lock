@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aeada268f4ca23a8e51adab6557d51ad",
+    "content-hash": "9a8d4d4a59c761923b3690d8347cc5f0",
     "packages": [
         {
             "name": "binance/binance-connector-php",
