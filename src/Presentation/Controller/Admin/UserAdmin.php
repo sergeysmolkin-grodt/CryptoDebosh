@@ -2,6 +2,7 @@
 
 namespace App\Presentation\Controller\Admin;
 
+use App\Domain\Entities\User;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
@@ -12,9 +13,20 @@ use Sonata\AdminBundle\Route\RouteCollectionInterface;
 //TODO replace Admin folder to Web folder
 final class UserAdmin extends AbstractAdmin
 {
-    public $baseRouteName = 'admin_user';
-    public $baseRoutePattern = 'admin/user';
+    protected $baseRouteName = 'user';
 
+    protected $baseRoutePattern = 'user';
+
+    protected $classnameLabel = 'User';
+
+    protected function configureDatagridFilters(DatagridMapper $filter): void
+    {
+        $filter->add('name')
+            ->add('email')
+            ->add('balance')
+            ->add('address')
+            ->add('roles');
+    }
     protected function configureRoutes(RouteCollectionInterface $collection): void
     {
         // Define your routes here

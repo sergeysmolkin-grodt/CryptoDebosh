@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Crypto Rates{% endblock %}
+
+{% block body %}
+    <h1>Crypto Rates</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Cryptocurrency</th>
+            <th>Rate</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for crypto, rate in cryptoRates %}
+            <tr>
+                <td>{{ crypto }}</td>
+                <td>{{ rate }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Balance: {{ balance }}</h2>
+{% endblock %}

@@ -1,0 +1,9 @@
+controllers:
+  resource:
+    path: ../../src/Presentation/Controller/Web
+    namespace: Presentation/Controller/Web
+  type: attribute
+
+kernel:
+  resource: App\Kernel
+  type: attribute

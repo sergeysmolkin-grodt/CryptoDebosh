@@ -6,7 +6,6 @@ use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Infrastructure\Persistence\Doctrine\UserRepository")
  * @ORM\Table(name="users")
  */
 class User

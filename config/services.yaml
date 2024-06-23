@@ -1,4 +1,10 @@
 services:
+    app.admin.user:
+        class: App\Presentation\Controller\Admin\UserAdmin
+        arguments: [ ~, App\Domain\Entities\User, ~ ]
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: User }
+
     _defaults:
         autowire: true
         autoconfigure: true
@@ -80,8 +86,4 @@ services:
             - { name: security.voter }
 
 
-    admin.user:
-        class: App\Presentation\Controller\Admin\UserAdmin
-        tags:
-            - { name: sonata.admin, model_class: App\Domain\Entities\User, manager_type: orm, label: User }
 
