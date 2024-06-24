@@ -70,6 +70,17 @@ services:
         arguments:
             $tradingBotService: '@App\Application\Services\TradingBotService'
 
+    App\Infrastructure\Services\External\ArbitrageService:
+        arguments:
+            $binanceApiService: '@App\Infrastructure\Services\External\BinanceApiService'
+            $logger: '@logger'
+            $tradingFee: '%env(TRADING_FEE)%'
+
+    App\Presentation\Commands\ArbitrageBotCommand:
+        tags: [ 'console.command' ]
+        arguments:
+            $arbitrageService: '@App\Infrastructure\Services\External\ArbitrageService'
+
     # Utils
     App\Shared\Utils\DateFormatter: ~
 
@@ -84,6 +95,17 @@ services:
     App\Infrastructure\Security\AdminAccessVoter:
         tags:
             - { name: security.voter }
+
+    App\Infrastructure\Services\External\BinanceApiService:
+        arguments:
+            $apiKey: '%env(BINANCE_API_KEY)%'
+            $apiSecret: '%env(BINANCE_SECRET_KEY)%'
+
+    App\Infrastructure\Services\External\CoinbaseApiService:
+        arguments:
+            $client: '@http_client'
+
+
 
 
 

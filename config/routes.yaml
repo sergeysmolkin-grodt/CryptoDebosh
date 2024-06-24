@@ -1,5 +1,15 @@
 # config/routes.yaml
 
+# config/routes.yaml
+arbitrage_index:
+  path: /arbitrage
+  controller: App\Infrastructure\Controllers\API\ArbitrageController::index
+
+arbitrage_execute:
+  path: /arbitrage/execute
+  controller: App\Infrastructure\Controllers\API\ArbitrageController::executeArbitrage
+
+
 trading_bot:
   path: /trading-bot
   controller: App\Controller\TradingBotController::index
