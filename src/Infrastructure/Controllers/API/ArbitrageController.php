@@ -44,11 +44,23 @@ class ArbitrageController extends AbstractController
         $symbol = $opportunity['symbol'];
         $buyPrice = $opportunity['buy_price'];
         $sellPrice = $opportunity['sell_price'];
-        $quantity = 0.001;
+        $quantity = 10;
 
         try {
-            $this->binanceApiService->placeOrder($symbol, 'BUY', 'LIMIT', $quantity, $buyPrice);
-            $this->binanceApiService->placeOrder($symbol, 'SELL', 'LIMIT', $quantity, $sellPrice);
+            $buyOrderResponse = $this->binanceApiService->placeOrder($symbol, 'BUY', 'LIMIT', $quantity, $buyPrice);
+            if (isset($buyOrderResponse['orderId'])) {
+                echo "Buy order executed successfully. Order ID: " . $buyOrderResponse['orderId'] . "\n";
+            } else {
+                echo "Buy order execution failed.\n";
+            }
+
+            $sellOrderResponse = $this->binanceApiService->placeOrder($symbol, 'SELL', 'LIMIT', $quantity, $sellPrice);
+            if (isset($sellOrderResponse['orderId'])) {
+                echo "Sell order executed successfully. Order ID: " . $sellOrderResponse['orderId'] . "\n";
+            } else {
+                echo "Sell order execution failed.\n";
+            }
+
             $this->logTransaction($symbol, $buyPrice, $sellPrice, $quantity);
         } catch (\Exception $e) {
             $this->logError($e->getMessage());
