@@ -1,21 +1,37 @@
 <?php
 
+/*
+ * config/services.php
+ *
+ * This file is used to define services for the application.
+ *
+ * The services defined here are automatically registered with the Symfony service container.
+ *
+ *
+ */
+
+// config/services.php
+
+// config/services.php
+
+// config/services.php
+
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use App\Infrastructure\Persistence\Doctrine\UserRepository;
-use Doctrine\Persistence\ManagerRegistry;
+use App\Presentation\Controller\Web\FirstPageController;
 
-return static function (ContainerConfigurator $configurator): void {
-    $services = $configurator->services()
-        ->defaults()
+return function (ContainerConfigurator $containerConfigurator) {
+    $services = $containerConfigurator->services();
+
+    $services->defaults()
         ->autowire(true)
-        ->autoconfigure(true);
+        ->autoconfigure(true)
+        ->public();
 
-    $services->set(UserRepository::class)
-        ->arg('$registry', service(ManagerRegistry::class));
+    $services->load('App\\Presentation\\Controller\\', '../src/Presentation/Controller/')
+        ->tag('controller.service_arguments')
+        ->public();
 
-    // Load all services in src/
-    $services->load('App\\', '../src/*')
-        ->exclude('../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}');
-
-    // Other services configuration...
+    $services->set(FirstPageController::class)
+        ->public()
+        ->tag('controller.service_arguments');
 };
