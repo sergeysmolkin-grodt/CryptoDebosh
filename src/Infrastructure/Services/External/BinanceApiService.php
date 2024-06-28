@@ -50,4 +50,11 @@ class BinanceApiService
 
         return $this->client->newOrder($symbol, $side, $type, $params);
     }
+
+    public function getHistoricalData($symbol, $interval, $startTime)
+    {
+        return $this->client->klines($symbol, $interval, [
+            'startTime' => $startTime
+        ]);
+    }
 }
