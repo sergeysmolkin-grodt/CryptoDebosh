@@ -1,12 +1,7 @@
 <?php
+// src/Infrastructure/Services/BinanceSpot.php
 
 declare(strict_types=1);
-namespace App\Infrastructure\Services;
-// src/Infrastructure/Services/BinanceSpot.php
-
-
-// src/Infrastructure/Services/BinanceSpot.php
-
 namespace App\Infrastructure\Services;
 
 use GuzzleHttp\Client;

@@ -5,6 +5,7 @@
         "@babel/preset-react": "^7.24.7",
         "@symfony/webpack-encore": "^4.6.1",
         "core-js": "^3.23.0",
+        "file-loader": "^6.0.0",
         "postcss-loader": "^7.0.0",
         "regenerator-runtime": "^0.13.9",
         "sass": "^1.77.6",
@@ -22,8 +23,10 @@
         "build": "encore production --progress"
     },
     "dependencies": {
+        "@popperjs/core": "^2.11.8",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
-        "stimulus": "^3.2.2"
+        "stimulus": "^3.2.2",
+        "wowjs": "^1.1.3"
     }
 }
