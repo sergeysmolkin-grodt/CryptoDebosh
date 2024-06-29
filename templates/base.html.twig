@@ -1,16 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Welcome{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Welcome!{% endblock %}</title>
     {{ encore_entry_link_tags('app') }}
-    {{ encore_entry_link_tags('global') }}
 </head>
 <body>
-{% include 'navigation.html.twig' %}
-<div class="content">
-    {% block body %}{% endblock %}
-</div>
+<div id="root"></div>
 {{ encore_entry_script_tags('app') }}
 </body>
 </html>

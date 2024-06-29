@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-
-
 namespace App\Presentation\Controller\Web;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,4 +19,14 @@ class FirstPageController extends AbstractController
     {
         return $this->render('main/first-page.index.html.twig');
     }
+
+    #[Route(
+        path: '/other-page',
+        name: 'homepage',
+        methods: ['GET'])]
+    public function otherPage()
+    {
+        return $this->render('main/first-page.index.html.twig');
+    }
+
 }
