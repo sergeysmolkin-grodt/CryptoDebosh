@@ -7,5 +7,4 @@ framework:
         cookie_secure: auto
     router:
         utf8: true
-    # Удалите или закомментируйте строки ниже
-    # annotations: true
+

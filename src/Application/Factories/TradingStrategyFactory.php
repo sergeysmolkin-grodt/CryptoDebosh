@@ -4,7 +4,7 @@
 
 namespace App\Application\Factories;
 
-use App\Application\Contracts\TradingStrategyInterface;
+use App\Application\Contracts\TradingBots\TradingStrategyInterface;
 use InvalidArgumentException;
 
 class TradingStrategyFactory

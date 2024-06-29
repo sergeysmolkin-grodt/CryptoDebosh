@@ -1,10 +1,8 @@
 <?php
 
+namespace App\Application\Services\TradingBots\Spot;
 
-
-namespace App\Application\Services;
-
-use App\Application\Contracts\TradingStrategyInterface;
+use App\Application\Contracts\TradingBots\TradingStrategyInterface;
 use App\Infrastructure\Services\BinanceSpot;
 
 class MovingAverageStrategy implements TradingStrategyInterface
