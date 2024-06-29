@@ -20,13 +20,5 @@ class FirstPageController extends AbstractController
         return $this->render('main/first-page.index.html.twig');
     }
 
-    #[Route(
-        path: '/other-page',
-        name: 'homepage',
-        methods: ['GET'])]
-    public function otherPage()
-    {
-        return $this->render('main/first-page.index.html.twig');
-    }
 
 }

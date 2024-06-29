@@ -7,7 +7,19 @@
     {{ encore_entry_link_tags('app') }}
 </head>
 <body>
+<script>
+    window.appUrls = {
+        tradingBots: "{{ path('trading-bots') }}"
+    };
+</script>
 <div id="root"></div>
+
 {{ encore_entry_script_tags('app') }}
+
+{% block body %}{% endblock %}
+
+<script src="{{ asset('build/runtime.js') }}"></script>
+<script src="{{ asset('build/app.js') }}"></script>
+
 </body>
 </html>
