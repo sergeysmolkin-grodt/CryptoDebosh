@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Services;
 
-use App\Domain\Repositories\BalanceRepositoryInterface;
-use App\Domain\Repositories\CryptoRatesRepositoryInterface;
+use App\Domain\Repositories\Contracts\BalanceRepositoryInterface;
+use App\Domain\Repositories\Contracts\CryptoRatesRepositoryInterface;
 
 class CryptoService
 {

@@ -1,3 +1,0 @@
-controllers:
-  namespace: Presentation/Controller/Web
-  type: annotation

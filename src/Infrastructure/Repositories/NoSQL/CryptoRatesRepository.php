@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Repositories\NoSQL;
 
-use App\Domain\Repositories\CryptoRatesRepositoryInterface;
+use App\Domain\Repositories\Contracts\CryptoRatesRepositoryInterface;
 
 class CryptoRatesRepository implements CryptoRatesRepositoryInterface
 {

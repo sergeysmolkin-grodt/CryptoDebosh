@@ -165,6 +165,8 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/string" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/var-dumper" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/theseer/tokenizer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/ccxt/ccxt" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pear/console_table" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
